@@ -1,0 +1,12 @@
+# Dependencias de Laravel y React
+/vendor/
+/node_modules/
+/public/build/
+
+# Entorno de Python
+venv/
+__pycache__/
+
+# Variables de entorno y configuraciones locales
+.env
+.env.backup
