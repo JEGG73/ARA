@@ -11,14 +11,14 @@ Laravel generará automáticamente tokens CSRF para cada sesión activa,
 protegiendo los endpoints de la aplicación contra peticiones maliciosas
 forzadas desde sitios de terceros.
 
---Prevención de Inyección SQL
+-- Prevención de Inyección SQL
 El uso estricto del ORM Eloquent y el Query Builder de Laravel asegura
 que todas las consultas a la base de datos MySQL utilicen parámetros
 preparados (PDO). Esto sanitiza las entradas de telemetría
 automáticamente, neutralizando cualquier intento de inyección de código
 SQL.
 
---Protección XSS (Cross-Site Scripting)
+-- Protección XSS (Cross-Site Scripting)
 La combinación del motor de respuestas de Laravel y el Virtual DOM de
 React garantiza que las variables y respuestas de la API se escapen
 automáticamente antes de ser renderizadas en la vista del usuario,
