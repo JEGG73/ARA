@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { Table, Badge } from 'react-bootstrap';
+import 'animate.css';
 import './App.css';
 
 function App() {
@@ -11,14 +13,30 @@ function App() {
   const [ph, setPh] = useState(6.5);
   const [estadoAgrobot, setEstadoAgrobot] = useState('Conectado y transmitiendo');
 
-  const actualizarTelemetria = () => {
-    setEstadoAgrobot('Recibiendo datos del Agrobot...');
-    setTimeout(() => {
-      setNitrogeno(Math.floor(Math.random() * (60 - 30 + 1)) + 30);
-      setFosforo(Math.floor(Math.random() * (20 - 5 + 1)) + 5);
-      setPh((Math.random() * (7.5 - 5.5) + 5.5).toFixed(1));
-      setEstadoAgrobot('Conectado y transmitiendo');
-    }, 1000);
+  // Funcion con Fetch API
+  const actualizarTelemetria = async () => {
+    setEstadoAgrobot('Consultando al servidor por HTTP...');
+
+    try {
+      const response = await fetch('/telemetria.json');
+
+      if (!response.ok) {
+        throw new Error('Error en la respuesta del servidor');
+      }
+
+      const data = await response.json();
+
+      setTimeout(() => {
+        setNitrogeno(data.nitrogeno);
+        setFosforo(data.fosforo);
+        setPh(data.ph);
+        setEstadoAgrobot(data.estado);
+      }, 800);
+
+    } catch (error) {
+      console.error("Error en Fetch API:", error);
+      setEstadoAgrobot('Error de conexión con la API 🔴');
+    }
   };
 
   return (
@@ -58,20 +76,25 @@ function App() {
           <section id="dashboard" className="fade-in">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gridColumn: '1 / -1' }}>
               <h2>Lecturas en Tiempo Real</h2>
-              <button className="btn-accion" onClick={actualizarTelemetria}>↻ Sincronizar Agrobot</button>
+              <button
+                className="btn-accion animate__animated animate__pulse animate__infinite"
+                onClick={actualizarTelemetria}
+              >
+                ↻ Sincronizar Agrobot
+              </button>
             </div>
 
-            <article>
+            <article className="animate__animated animate__fadeInUp">
               <h3>Nitrógeno (N)</h3>
               <p>Nivel actual: <strong>{nitrogeno} mg/kg</strong></p>
             </article>
 
-            <article>
+            <article className="animate__animated animate__fadeInUp animate__delay-1s">
               <h3>Fósforo (P)</h3>
               <p>Nivel actual: <strong>{fosforo} mg/kg</strong></p>
             </article>
 
-            <article>
+            <article className="animate__animated animate__fadeInUp animate__delay-2s">
               <h3>pH del Suelo</h3>
               <p>Nivel actual: <strong>{ph}</strong></p>
             </article>
@@ -82,8 +105,8 @@ function App() {
         {vistaActiva === 'historial' && (
           <section id="historial" className="fade-in">
             <h2>Historial de Análisis de Campo</h2>
-            <div className="tabla-responsive">
-              <table className="ara-tabla">
+            <div className="mt-4">
+              <Table striped bordered hover variant="dark" responsive>
                 <thead>
                   <tr>
                     <th>Fecha y Hora</th>
@@ -116,7 +139,7 @@ function App() {
                     <td>6.8</td>
                   </tr>
                 </tbody>
-              </table>
+              </Table>
             </div>
           </section>
         )}
@@ -144,7 +167,12 @@ function App() {
 
       <footer>
         <p>&copy; 2026 Sistema ARA Web. Módulo de Desarrollo Web.</p>
-        <p>Estado del Agrobot: <em>{estadoAgrobot}</em></p>
+        <p>
+          Estado del Agrobot:{' '}
+          <Badge bg={estadoAgrobot.includes('Recibiendo') ? 'warning' : 'success'}>
+            {estadoAgrobot}
+          </Badge>
+        </p>
       </footer>
     </div>
   );
