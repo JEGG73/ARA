@@ -20,6 +20,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'subscription_id'
     ];
 
     /**
@@ -43,5 +44,20 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function subscription()
+    {
+        return $this->belongsTo(Subscription::class);
+    }
+
+    public function agrobots()
+    {
+        return $this->hasMany(Agrobot::class);
+    }
+
+    public function aiConsultations()
+    {
+        return $this->hasMany(AiConsultation::class);
     }
 }
