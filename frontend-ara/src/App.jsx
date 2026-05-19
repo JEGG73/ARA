@@ -3,17 +3,29 @@ import { Table, Badge } from 'react-bootstrap';
 import 'animate.css';
 import './App.css';
 
+import Login from "./views/auth/Login";
+import Register from "./views/auth/Register";
+import ForgotPassword from "./views/auth/ForgotPassword";
+import ResetPassword from "./views/auth/ResetPassword";
+
 function App() {
 
   const [vistaActiva, setVistaActiva] = useState('dashboard');
+  const [authVista, setAuthVista] = useState('login');
 
   const [nitrogeno, setNitrogeno] = useState(45);
   const [fosforo, setFosforo] = useState(12);
   const [ph, setPh] = useState(6.5);
+
   const [estadoAgrobot, setEstadoAgrobot] = useState('Conectado y transmitiendo');
+
   const [mensajes, setMensajes] = useState([
-    { rol: 'ia', texto: '¡Hola! Soy TerraMind IA. He analizado la telemetría actual de tu parcela. ¿En qué te ayudo?' }
+    {
+      rol: 'ia',
+      texto: '¡Hola! Soy ARA IA. He analizado la telemetría actual de tu parcela. ¿En qué te ayudo?'
+    }
   ]);
+
   const [inputChat, setInputChat] = useState('');
   const [cargandoIA, setCargandoIA] = useState(false);
 
@@ -49,14 +61,20 @@ function App() {
   };
 
   const enviarMensajeIA = async () => {
-    if (!inputChat.trim()) return
 
-    const nuevosMensajes = [...mensajes, { rol: 'usuario', texto: inputChat }];
+    if (!inputChat.trim()) return;
+
+    const nuevosMensajes = [
+      ...mensajes,
+      { rol: 'usuario', texto: inputChat }
+    ];
+
     setMensajes(nuevosMensajes);
     setInputChat('');
     setCargandoIA(true);
 
     try {
+
       const response = await fetch('http://localhost:8000/api/chat', {
         method: 'POST',
         headers: {
@@ -76,13 +94,27 @@ function App() {
 
       const data = await response.json();
 
-      setMensajes(prevMensajes => [...prevMensajes, { rol: 'ia', texto: data.respuesta_ia }]);
+      setMensajes(prevMensajes => [
+        ...prevMensajes,
+        { rol: 'ia', texto: data.respuesta_ia }
+      ]);
 
     } catch (error) {
+
       console.error("Error al consultar a la IA:", error);
-      setMensajes(prevMensajes => [...prevMensajes, { rol: 'ia', texto: 'Lo siento, perdí la conexión con el servidor. Intenta de nuevo.' }]);
+
+      setMensajes(prevMensajes => [
+        ...prevMensajes,
+        {
+          rol: 'ia',
+          texto: 'Lo siento, perdí la conexión con el servidor. Intenta de nuevo.'
+        }
+      ]);
+
     } finally {
+
       setCargandoIA(false);
+
     }
   };
 
@@ -98,6 +130,7 @@ function App() {
         </div>
 
         <nav>
+
           <ul>
 
             <li>
@@ -127,61 +160,88 @@ function App() {
               </button>
             </li>
 
+            <li>
+              <button
+                className={vistaActiva === 'cuenta' ? 'nav-btn activo' : 'nav-btn'}
+                onClick={() => setVistaActiva('cuenta')}
+              >
+                Cuenta
+              </button>
+            </li>
+
           </ul>
+
         </nav>
 
       </header>
 
-      <section className="hero">
+      {vistaActiva !== 'cuenta' && (
 
-        <div className="hero-overlay">
+        <>
 
-          <h1 className="hero-title">
-            Agricultura Inteligente
-          </h1>
+          <section className="hero">
 
-          <p className="hero-subtitle">
-            Plataforma de monitoreo agrícola impulsada por Inteligencia Artificial y Agrobots.
-          </p>
+            <div className="hero-overlay">
 
-          <button className="hero-btn">
-            Explorar Plataforma
-          </button>
+              <h1 className="hero-title">
+                Agricultura Inteligente
+              </h1>
 
-        </div>
+              <p className="hero-subtitle">
+                Plataforma de monitoreo agrícola impulsada por Inteligencia Artificial y Agrobots.
+              </p>
 
-      </section>
+              <button className="hero-btn">
+                Explorar Plataforma
+              </button>
 
-      <section className="servicios">
+            </div>
 
-        <h2>Nuestros Servicios</h2>
+          </section>
 
-        <div className="cards-servicios">
+          <section className="servicios">
 
-          <div className="service-card">
-            <h3>Telemetría en Tiempo Real</h3>
-            <p>
-              Monitorea niveles de nitrógeno, fósforo y pH desde cualquier lugar.
-            </p>
-          </div>
+            <h2>Nuestros Servicios</h2>
 
-          <div className="service-card">
-            <h3>Asistente IA</h3>
-            <p>
-              Recomendaciones inteligentes para optimizar la producción agrícola.
-            </p>
-          </div>
+            <div className="cards-servicios">
 
-          <div className="service-card">
-            <h3>Integración Agrobot</h3>
-            <p>
-              Sincronización avanzada con robots agrícolas autónomos.
-            </p>
-          </div>
+              <div className="service-card">
 
-        </div>
+                <h3>Telemetría en Tiempo Real</h3>
 
-      </section>
+                <p>
+                  Monitorea niveles de nitrógeno, fósforo y pH desde cualquier lugar.
+                </p>
+
+              </div>
+
+              <div className="service-card">
+
+                <h3>Asistente IA</h3>
+
+                <p>
+                  Recomendaciones inteligentes para optimizar la producción agrícola.
+                </p>
+
+              </div>
+
+              <div className="service-card">
+
+                <h3>Integración Agrobot</h3>
+
+                <p>
+                  Sincronización avanzada con robots agrícolas autónomos.
+                </p>
+
+              </div>
+
+            </div>
+
+          </section>
+
+        </>
+
+      )}
 
       <main>
 
@@ -201,7 +261,7 @@ function App() {
               <h2>Lecturas en Tiempo Real</h2>
 
               <button
-                className="btn-accion animate__animated animate__pulse animate__infinite"
+                className="btn-accion animate_animated animatepulse animate_infinite"
                 onClick={actualizarTelemetria}
               >
                 ↻ Sincronizar Agrobot
@@ -209,7 +269,7 @@ function App() {
 
             </div>
 
-            <article className="animate__animated animate__fadeInUp">
+            <article className="animate_animated animate_fadeInUp">
 
               <h3>Nitrógeno (N)</h3>
 
@@ -219,7 +279,7 @@ function App() {
 
             </article>
 
-            <article className="animate__animated animate__fadeInUp animate__delay-1s">
+            <article className="animate_animated animatefadeInUp animate_delay-1s">
 
               <h3>Fósforo (P)</h3>
 
@@ -229,7 +289,7 @@ function App() {
 
             </article>
 
-            <article className="animate__animated animate__fadeInUp animate__delay-2s">
+            <article className="animate_animated animatefadeInUp animate_delay-2s">
 
               <h3>pH del Suelo</h3>
 
@@ -300,36 +360,73 @@ function App() {
         )}
 
         {vistaActiva === 'chat' && (
+
           <section id="ia-chat" className="fade-in">
+
             <h2>Asistente Predictivo (ARA IA)</h2>
 
             <div className="chat-container">
 
-              <div className="historial-mensajes" style={{ maxHeight: '400px', overflowY: 'auto', padding: '10px' }}>
+              <div
+                className="historial-mensajes"
+                style={{
+                  maxHeight: '400px',
+                  overflowY: 'auto',
+                  padding: '10px'
+                }}
+              >
+
                 {mensajes.map((msg, index) => (
-                  <div key={index} className={`mensaje ${msg.rol === 'usuario' ? 'mensaje-usuario' : 'mensaje-ia'}`}>
+
+                  <div
+                    key={index}
+                    className={`mensaje ${
+                      msg.rol === 'usuario'
+                        ? 'mensaje-usuario'
+                        : 'mensaje-ia'
+                    }`}
+                  >
+
                     <p>
-                      <strong>{msg.rol === 'usuario' ? 'Tú' : 'ARA IA'}:</strong> {msg.texto}
+                      <strong>
+                        {msg.rol === 'usuario' ? 'Tú' : 'ARA IA'}:
+                      </strong>{' '}
+                      {msg.texto}
                     </p>
+
                   </div>
+
                 ))}
 
                 {cargandoIA && (
+
                   <div className="mensaje mensaje-ia">
-                    <p><em>Analizando datos de suelo...</em></p>
+
+                    <p>
+                      <em>Analizando datos de suelo...</em>
+                    </p>
+
                   </div>
+
                 )}
+
               </div>
 
               <div className="chat-input-area">
+
                 <input
                   type="text"
                   placeholder="Escribe tu consulta agronómica aquí..."
                   value={inputChat}
                   onChange={(e) => setInputChat(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && !cargandoIA && enviarMensajeIA()}
+                  onKeyDown={(e) =>
+                    e.key === 'Enter' &&
+                    !cargandoIA &&
+                    enviarMensajeIA()
+                  }
                   disabled={cargandoIA}
                 />
+
                 <button
                   className="btn-accion"
                   onClick={enviarMensajeIA}
@@ -337,10 +434,58 @@ function App() {
                 >
                   Enviar
                 </button>
+
               </div>
 
             </div>
+
           </section>
+        )}
+
+        {vistaActiva === 'cuenta' && (
+
+          <div>
+
+            <div
+              style={{
+                display: 'flex',
+                gap: '10px',
+                justifyContent: 'center',
+                marginBottom: '20px',
+                marginTop: '20px'
+              }}
+            >
+
+              <button
+                className="nav-btn"
+                onClick={() => setAuthVista('login')}
+              >
+                Login
+              </button>
+
+              <button
+                className="nav-btn"
+                onClick={() => setAuthVista('register')}
+              >
+                Registro
+              </button>
+
+              <button
+                className="nav-btn"
+                onClick={() => setAuthVista('forgot')}
+              >
+                Recuperar
+              </button>
+
+            </div>
+
+            {authVista === 'login' && <Login />}
+            {authVista === 'register' && <Register />}
+            {authVista === 'forgot' && <ForgotPassword />}
+            {authVista === 'reset' && <ResetPassword />}
+
+          </div>
+
         )}
 
       </main>
