@@ -11,6 +11,11 @@ function App() {
   const [fosforo, setFosforo] = useState(12);
   const [ph, setPh] = useState(6.5);
   const [estadoAgrobot, setEstadoAgrobot] = useState('Conectado y transmitiendo');
+  const [mensajes, setMensajes] = useState([
+    { rol: 'ia', texto: '¡Hola! Soy TerraMind IA. He analizado la telemetría actual de tu parcela. ¿En qué te ayudo?' }
+  ]);
+  const [inputChat, setInputChat] = useState('');
+  const [cargandoIA, setCargandoIA] = useState(false);
 
   const actualizarTelemetria = async () => {
 
@@ -40,6 +45,44 @@ function App() {
       console.error("Error en Fetch API:", error);
       setEstadoAgrobot('Error de conexión con la API 🔴');
 
+    }
+  };
+
+  const enviarMensajeIA = async () => {
+    if (!inputChat.trim()) return
+
+    const nuevosMensajes = [...mensajes, { rol: 'usuario', texto: inputChat }];
+    setMensajes(nuevosMensajes);
+    setInputChat('');
+    setCargandoIA(true);
+
+    try {
+      const response = await fetch('http://localhost:8000/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer 1|Ypa81gP6LwS2GYYiPgeyadbOpRaYUIsSg4ep072b1d50f883'
+        },
+        body: JSON.stringify({
+          prompt: inputChat,
+          agrobot_id: 1
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Error de autorizacion o en el servidor');
+      }
+
+      const data = await response.json();
+
+      setMensajes(prevMensajes => [...prevMensajes, { rol: 'ia', texto: data.respuesta_ia }]);
+
+    } catch (error) {
+      console.error("Error al consultar a la IA:", error);
+      setMensajes(prevMensajes => [...prevMensajes, { rol: 'ia', texto: 'Lo siento, perdí la conexión con el servidor. Intenta de nuevo.' }]);
+    } finally {
+      setCargandoIA(false);
     }
   };
 
@@ -257,47 +300,47 @@ function App() {
         )}
 
         {vistaActiva === 'chat' && (
-
           <section id="ia-chat" className="fade-in">
-
             <h2>Asistente Predictivo (ARA IA)</h2>
 
             <div className="chat-container">
 
-              <div className="mensaje mensaje-usuario">
+              <div className="historial-mensajes" style={{ maxHeight: '400px', overflowY: 'auto', padding: '10px' }}>
+                {mensajes.map((msg, index) => (
+                  <div key={index} className={`mensaje ${msg.rol === 'usuario' ? 'mensaje-usuario' : 'mensaje-ia'}`}>
+                    <p>
+                      <strong>{msg.rol === 'usuario' ? 'Tú' : 'ARA IA'}:</strong> {msg.texto}
+                    </p>
+                  </div>
+                ))}
 
-                <p>
-                  <strong>Tú:</strong> ¿Qué recomiendas para la Parcela Norte según el historial reciente?
-                </p>
-
-              </div>
-
-              <div className="mensaje mensaje-ia">
-
-                <p>
-                  <strong>ARA IA:</strong> Analizando el histórico de los últimos 3 días, he detectado una tendencia a la baja en el Fósforo (P). Recomiendo una aplicación preventiva de superfosfato de calcio antes de la próxima lluvia.
-                </p>
-
+                {cargandoIA && (
+                  <div className="mensaje mensaje-ia">
+                    <p><em>Analizando datos de suelo...</em></p>
+                  </div>
+                )}
               </div>
 
               <div className="chat-input-area">
-
                 <input
                   type="text"
                   placeholder="Escribe tu consulta agronómica aquí..."
-                  disabled
+                  value={inputChat}
+                  onChange={(e) => setInputChat(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && !cargandoIA && enviarMensajeIA()}
+                  disabled={cargandoIA}
                 />
-
-                <button className="btn-accion" disabled>
+                <button
+                  className="btn-accion"
+                  onClick={enviarMensajeIA}
+                  disabled={cargandoIA || !inputChat.trim()}
+                >
                   Enviar
                 </button>
-
               </div>
 
             </div>
-
           </section>
-
         )}
 
       </main>
