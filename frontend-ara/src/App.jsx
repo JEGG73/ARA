@@ -13,6 +13,9 @@ function App() {
   const [vistaActiva, setVistaActiva] = useState('dashboard');
   const [authVista, setAuthVista] = useState('login');
 
+  // MENÚ HAMBURGUESA
+  const [menuAbierto, setMenuAbierto] = useState(false);
+
   const [nitrogeno, setNitrogeno] = useState(45);
   const [fosforo, setFosforo] = useState(12);
   const [ph, setPh] = useState(6.5);
@@ -112,9 +115,7 @@ function App() {
       ]);
 
     } finally {
-
       setCargandoIA(false);
-
     }
   };
 
@@ -131,12 +132,22 @@ function App() {
 
         <nav>
 
-          <ul>
+          <button
+            className="hamburger"
+            onClick={() => setMenuAbierto(!menuAbierto)}
+          >
+            ☰
+          </button>
+
+          <ul className={menuAbierto ? "active" : ""}>
 
             <li>
               <button
                 className={vistaActiva === 'dashboard' ? 'nav-btn activo' : 'nav-btn'}
-                onClick={() => setVistaActiva('dashboard')}
+                onClick={() => {
+                  setVistaActiva('dashboard');
+                  setMenuAbierto(false);
+                }}
               >
                 Inicio
               </button>
@@ -145,7 +156,10 @@ function App() {
             <li>
               <button
                 className={vistaActiva === 'historial' ? 'nav-btn activo' : 'nav-btn'}
-                onClick={() => setVistaActiva('historial')}
+                onClick={() => {
+                  setVistaActiva('historial');
+                  setMenuAbierto(false);
+                }}
               >
                 Historial
               </button>
@@ -154,7 +168,10 @@ function App() {
             <li>
               <button
                 className={vistaActiva === 'chat' ? 'nav-btn activo' : 'nav-btn'}
-                onClick={() => setVistaActiva('chat')}
+                onClick={() => {
+                  setVistaActiva('chat');
+                  setMenuAbierto(false);
+                }}
               >
                 IA
               </button>
@@ -163,7 +180,10 @@ function App() {
             <li>
               <button
                 className={vistaActiva === 'cuenta' ? 'nav-btn activo' : 'nav-btn'}
-                onClick={() => setVistaActiva('cuenta')}
+                onClick={() => {
+                  setVistaActiva('cuenta');
+                  setMenuAbierto(false);
+                }}
               >
                 Cuenta
               </button>
@@ -178,7 +198,6 @@ function App() {
       {vistaActiva !== 'cuenta' && (
 
         <>
-
           <section className="hero">
 
             <div className="hero-overlay">
@@ -206,62 +225,37 @@ function App() {
             <div className="cards-servicios">
 
               <div className="service-card">
-
                 <h3>Telemetría en Tiempo Real</h3>
-
-                <p>
-                  Monitorea niveles de nitrógeno, fósforo y pH desde cualquier lugar.
-                </p>
-
+                <p>Monitorea niveles de nitrógeno, fósforo y pH desde cualquier lugar.</p>
               </div>
 
               <div className="service-card">
-
                 <h3>Asistente IA</h3>
-
-                <p>
-                  Recomendaciones inteligentes para optimizar la producción agrícola.
-                </p>
-
+                <p>Recomendaciones inteligentes para optimizar la producción agrícola.</p>
               </div>
 
               <div className="service-card">
-
                 <h3>Integración Agrobot</h3>
-
-                <p>
-                  Sincronización avanzada con robots agrícolas autónomos.
-                </p>
-
+                <p>Sincronización avanzada con robots agrícolas autónomos.</p>
               </div>
 
             </div>
 
           </section>
-
         </>
-
       )}
 
       <main>
 
         {vistaActiva === 'dashboard' && (
+          <section id="dashboard">
 
-          <section id="dashboard" className="fade-in">
-
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                gridColumn: '1 / -1'
-              }}
-            >
+            <div className="dashboard-header">
 
               <h2>Lecturas en Tiempo Real</h2>
 
               <button
-                className="btn-accion animate_animated animatepulse animate_infinite"
+                className="btn-accion"
                 onClick={actualizarTelemetria}
               >
                 ↻ Sincronizar Agrobot
@@ -269,145 +263,76 @@ function App() {
 
             </div>
 
-            <article className="animate_animated animate_fadeInUp">
+            <div className="dashboard-cards">
 
-              <h3>Nitrógeno (N)</h3>
+              <div className="dashboard-card">
+                <h3>Nitrógeno (N)</h3>
+                <p>{nitrogeno} mg/kg</p>
+              </div>
 
-              <p>
-                Nivel actual: <strong>{nitrogeno} mg/kg</strong>
-              </p>
+              <div className="dashboard-card">
+                <h3>Fósforo (P)</h3>
+                <p>{fosforo} mg/kg</p>
+              </div>
 
-            </article>
-
-            <article className="animate_animated animatefadeInUp animate_delay-1s">
-
-              <h3>Fósforo (P)</h3>
-
-              <p>
-                Nivel actual: <strong>{fosforo} mg/kg</strong>
-              </p>
-
-            </article>
-
-            <article className="animate_animated animatefadeInUp animate_delay-2s">
-
-              <h3>pH del Suelo</h3>
-
-              <p>
-                Nivel actual: <strong>{ph}</strong>
-              </p>
-
-            </article>
-
-          </section>
-        )}
-
-        {vistaActiva === 'historial' && (
-
-          <section id="historial" className="fade-in">
-
-            <h2>Historial de Análisis de Campo</h2>
-
-            <div className="mt-4">
-
-              <Table striped bordered hover variant="dark" responsive>
-
-                <thead>
-
-                  <tr>
-                    <th>Fecha y Hora</th>
-                    <th>Sector</th>
-                    <th>N (mg/kg)</th>
-                    <th>P (mg/kg)</th>
-                    <th>pH</th>
-                  </tr>
-
-                </thead>
-
-                <tbody>
-
-                  <tr>
-                    <td>2026-04-06 08:30</td>
-                    <td>Parcela Norte</td>
-                    <td>42</td>
-                    <td>14</td>
-                    <td>6.4</td>
-                  </tr>
-
-                  <tr>
-                    <td>2026-04-05 16:15</td>
-                    <td>Parcela Norte</td>
-                    <td>44</td>
-                    <td>11</td>
-                    <td>6.5</td>
-                  </tr>
-
-                  <tr>
-                    <td>2026-04-04 09:00</td>
-                    <td>Parcela Sur</td>
-                    <td>38</td>
-                    <td>18</td>
-                    <td>6.8</td>
-                  </tr>
-
-                </tbody>
-
-              </Table>
+              <div className="dashboard-card">
+                <h3>pH del Suelo</h3>
+                <p>{ph}</p>
+              </div>
 
             </div>
 
           </section>
         )}
 
+        {vistaActiva === 'historial' && (
+          <section id="historial">
+
+            <h2>Historial de Análisis de Campo</h2>
+
+            <Table striped bordered hover variant="dark" responsive>
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Sector</th>
+                  <th>N</th>
+                  <th>P</th>
+                  <th>pH</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr><td>2026-04-06</td><td>Norte</td><td>42</td><td>14</td><td>6.4</td></tr>
+                <tr><td>2026-04-05</td><td>Norte</td><td>44</td><td>11</td><td>6.5</td></tr>
+                <tr><td>2026-04-04</td><td>Sur</td><td>38</td><td>18</td><td>6.8</td></tr>
+              </tbody>
+            </Table>
+
+          </section>
+        )}
+
         {vistaActiva === 'chat' && (
+          <section id="chat">
 
-          <section id="ia-chat" className="fade-in">
-
-            <h2>Asistente Predictivo (ARA IA)</h2>
+            <h2>ARA IA</h2>
 
             <div className="chat-container">
 
-              <div
-                className="historial-mensajes"
-                style={{
-                  maxHeight: '400px',
-                  overflowY: 'auto',
-                  padding: '10px'
-                }}
-              >
+              <div className="historial-mensajes">
 
-                {mensajes.map((msg, index) => (
-
+                {mensajes.map((msg, i) => (
                   <div
-                    key={index}
-                    className={`mensaje ${
-                      msg.rol === 'usuario'
-                        ? 'mensaje-usuario'
-                        : 'mensaje-ia'
-                    }`}
+                    key={i}
+                    className={msg.rol === 'usuario' ? 'mensaje-usuario' : 'mensaje-ia'}
                   >
-
-                    <p>
-                      <strong>
-                        {msg.rol === 'usuario' ? 'Tú' : 'ARA IA'}:
-                      </strong>{' '}
-                      {msg.texto}
-                    </p>
-
+                    {msg.texto}
                   </div>
-
                 ))}
 
                 {cargandoIA && (
-
-                  <div className="mensaje mensaje-ia">
-
-                    <p>
-                      <em>Analizando datos de suelo...</em>
-                    </p>
-
+                  <div className="mensaje-ia">
+                    Analizando...
                   </div>
-
                 )}
 
               </div>
@@ -415,23 +340,13 @@ function App() {
               <div className="chat-input-area">
 
                 <input
-                  type="text"
-                  placeholder="Escribe tu consulta agronómica aquí..."
                   value={inputChat}
                   onChange={(e) => setInputChat(e.target.value)}
-                  onKeyDown={(e) =>
-                    e.key === 'Enter' &&
-                    !cargandoIA &&
-                    enviarMensajeIA()
-                  }
-                  disabled={cargandoIA}
+                  onKeyDown={(e) => e.key === 'Enter' && enviarMensajeIA()}
+                  placeholder="Escribe..."
                 />
 
-                <button
-                  className="btn-accion"
-                  onClick={enviarMensajeIA}
-                  disabled={cargandoIA || !inputChat.trim()}
-                >
+                <button onClick={enviarMensajeIA}>
                   Enviar
                 </button>
 
@@ -443,37 +358,19 @@ function App() {
         )}
 
         {vistaActiva === 'cuenta' && (
+          <section className="cuenta-section">
 
-          <div>
+            <div className="auth-buttons">
 
-            <div
-              style={{
-                display: 'flex',
-                gap: '10px',
-                justifyContent: 'center',
-                marginBottom: '20px',
-                marginTop: '20px'
-              }}
-            >
-
-              <button
-                className="nav-btn"
-                onClick={() => setAuthVista('login')}
-              >
+              <button onClick={() => setAuthVista('login')}>
                 Login
               </button>
 
-              <button
-                className="nav-btn"
-                onClick={() => setAuthVista('register')}
-              >
+              <button onClick={() => setAuthVista('register')}>
                 Registro
               </button>
 
-              <button
-                className="nav-btn"
-                onClick={() => setAuthVista('forgot')}
-              >
+              <button onClick={() => setAuthVista('forgot')}>
                 Recuperar
               </button>
 
@@ -484,8 +381,7 @@ function App() {
             {authVista === 'forgot' && <ForgotPassword />}
             {authVista === 'reset' && <ResetPassword />}
 
-          </div>
-
+          </section>
         )}
 
       </main>
@@ -495,13 +391,10 @@ function App() {
         <p>&copy; 2026 Sistema ARA Web</p>
 
         <p>
-
-          Estado del Agrobot:{' '}
-
+          Estado del Agrobot:{" "}
           <Badge bg={estadoAgrobot.includes('Error') ? 'danger' : 'success'}>
             {estadoAgrobot}
           </Badge>
-
         </p>
 
       </footer>
