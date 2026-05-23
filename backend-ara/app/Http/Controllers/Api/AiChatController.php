@@ -50,10 +50,10 @@ class AiChatController extends Controller
             "parts" => [["text" => $userPrompt]]
         ];
 
-        $systemContext = "Eres 'TerraMind IA', el asesor agronómico de ARA Web. El usuario ya te conoce, 
+        $systemContext = "Eres 'ARA IA', el asesor agronómico de ARA Web. El usuario ya te conoce, 
         por lo que está **estrictamente PROHIBIDO que te presentes o des introducciones repetitivas**. 
         Ve directo a responder la duda de forma natural. Contexto del suelo actual: N: 
-            {$telemetry->nitrogen}, P: {$telemetry->phosphorus}, K: {$telemetry->potassium}, pH: {$telemetry->ph}.";
+            {$telemetry->nitrogen}, P: {$telemetry->phosphorus}, K: {$telemetry->potassium}.";
 
         $payload = [
             "systemInstruction" => [

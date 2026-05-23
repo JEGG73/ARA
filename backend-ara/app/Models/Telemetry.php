@@ -14,7 +14,6 @@ class Telemetry extends Model
         'nitrogen',
         'phosphorus',
         'potassium',
-        'ph',
     ];
 
     public function agrobot()

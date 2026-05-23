@@ -14,10 +14,9 @@ return new class extends Migration
         Schema::create('telemetries', function (Blueprint $table) {
             $table->id();
             $table->foreignId('agrobot_id')->constrained()->cascadeOnDelete();
-            $table->decimal('nitrogen', 5, 2);
-            $table->decimal('phosphorus', 5, 2);
-            $table->decimal('potassium', 5, 2);
-            $table->decimal('ph', 4, 2);
+            $table->decimal('nitrogen', 8, 2);
+            $table->decimal('phosphorus', 8, 2);
+            $table->decimal('potassium', 8, 2);
             $table->timestamps();
         });
     }

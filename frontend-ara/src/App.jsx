@@ -18,7 +18,7 @@ function App() {
 
   const [nitrogeno, setNitrogeno] = useState(45);
   const [fosforo, setFosforo] = useState(12);
-  const [ph, setPh] = useState(6.5);
+  const [potasio, setPotasio] = useState(6.5);
 
   const [estadoAgrobot, setEstadoAgrobot] = useState('Conectado y transmitiendo');
 
@@ -50,7 +50,7 @@ function App() {
 
         setNitrogeno(data.nitrogeno);
         setFosforo(data.fosforo);
-        setPh(data.ph);
+        setPotasio(data.potasio);
         setEstadoAgrobot(data.estado);
 
       }, 800);
@@ -226,7 +226,7 @@ function App() {
 
               <div className="service-card">
                 <h3>Telemetría en Tiempo Real</h3>
-                <p>Monitorea niveles de nitrógeno, fósforo y pH desde cualquier lugar.</p>
+                <p>Monitorea niveles de nitrógeno, fósforo y potasio desde cualquier lugar.</p>
               </div>
 
               <div className="service-card">
@@ -276,8 +276,8 @@ function App() {
               </div>
 
               <div className="dashboard-card">
-                <h3>pH del Suelo</h3>
-                <p>{ph}</p>
+                <h3>Potasio (K)</h3>
+                <p>{potasio}</p>
               </div>
 
             </div>
@@ -297,7 +297,7 @@ function App() {
                   <th>Sector</th>
                   <th>N</th>
                   <th>P</th>
-                  <th>pH</th>
+                  <th>K</th>
                 </tr>
               </thead>
 
