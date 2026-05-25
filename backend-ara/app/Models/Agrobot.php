@@ -13,7 +13,7 @@ class Agrobot extends Model
 
     protected $fillable = [
         'user_id',
-        'unique_address',
+        'mac_address',
         'name',
         'is_active'
     ];

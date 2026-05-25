@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('agrobots', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->string('unique_address')->unique();
+            $table->string('mac_address')->unique();
             $table->string('name')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
