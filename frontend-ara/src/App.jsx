@@ -23,6 +23,8 @@ function App() {
   const [estadoAgrobot, setEstadoAgrobot] =
     useState('Conectado y transmitiendo');
 
+  const [agrobotId, setAgrobotId] = useState("");
+
   const [mensajes, setMensajes] = useState([
     {
       rol: 'ia',
@@ -36,31 +38,48 @@ function App() {
 
   const actualizarTelemetria = async () => {
 
+    if (!agrobotId) {
+      setEstadoAgrobot('Error: Selecciona o registra un Agrobot primero');
+      return;
+    }
+
     setEstadoAgrobot('Consultando al servidor por HTTP...');
+    const token = localStorage.getItem('ara_token');
+
+    if (!token) {
+      setEstadoAgrobot('Error: No has iniciado sesión');
+      return;
+    }
 
     try {
-
-      const response = await fetch('/telemetria.json');
+      const response = await fetch(`http://localhost:8000/api/agrobots/${agrobotId}/telemetry`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
 
       if (!response.ok) {
         throw new Error('Error en la respuesta del servidor');
       }
 
-      const data = await response.json();
+      const resData = await response.json();
 
-      setTimeout(() => {
-
-        setNitrogeno(data.nitrogeno);
-        setFosforo(data.fosforo);
-        setPotasio(data.potasio);
-        setEstadoAgrobot(data.estado);
-
-      }, 800);
+      if (resData.data && resData.data.length > 0) {
+        const ultimaLectura = resData.data[0];
+        setNitrogeno(ultimaLectura.nitrogen);
+        setFosforo(ultimaLectura.phosphorus);
+        setPotasio(ultimaLectura.potassium);
+        setEstadoAgrobot("Sincronizado correctamente");
+      } else {
+        setEstadoAgrobot("Sin datos registrados aún");
+      }
 
     } catch (error) {
 
       console.error("Error en Fetch API:", error);
-      setEstadoAgrobot('Error de conexión con la API 🔴');
+      setEstadoAgrobot('Error de conexión con la API');
 
     }
   };
@@ -68,6 +87,13 @@ function App() {
   const enviarMensajeIA = async () => {
 
     if (!inputChat.trim()) return;
+
+    const token = localStorage.getItem('ara_token');
+
+    if (!token) {
+      alert('Por favor, inicia sesión para consultar a la IA');
+      return;
+    }
 
     const nuevosMensajes = [
       ...mensajes,
@@ -80,27 +106,22 @@ function App() {
 
     try {
 
-      const response = await fetch(
-        'http://localhost:8000/api/chat',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Authorization':
-              'Bearer 1|Ypa81gP6LwS2GYYiPgeyadbOpRaYUIsSg4ep072b1d50f883'
-          },
-          body: JSON.stringify({
-            prompt: inputChat,
-            agrobot_id: 1
-          })
-        }
+      const response = await fetch('http://localhost:8000/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          prompt: inputChat,
+          agrobot_id: agrobotId
+        })
+      }
       );
 
       if (!response.ok) {
-        throw new Error(
-          'Error de autorizacion o en el servidor'
-        );
+        throw new Error('Error de autorización o en el servidor');
       }
 
       const data = await response.json();
@@ -113,9 +134,7 @@ function App() {
     } catch (error) {
 
       console.error(
-        "Error al consultar a la IA:",
-        error
-      );
+        "Error al consultar a la IA:", error);
 
       setMensajes(prevMensajes => [
         ...prevMensajes,
@@ -127,9 +146,7 @@ function App() {
       ]);
 
     } finally {
-
       setCargandoIA(false);
-
     }
   };
 
@@ -259,7 +276,7 @@ function App() {
         )}
 
         {vistaActiva === 'historial' && (
-          <Historial />
+          <Historial agrobotId={agrobotId}/>
         )}
 
         {vistaActiva === 'chat' && (
@@ -276,6 +293,9 @@ function App() {
           <Cuenta
             authVista={authVista}
             setAuthVista={setAuthVista}
+            setVistaActiva={setVistaActiva}
+            agrobotId={agrobotId}
+            setAgrobotId={setAgrobotId}
           />
         )}
 

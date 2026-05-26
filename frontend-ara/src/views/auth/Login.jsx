@@ -1,13 +1,13 @@
 import { useState } from "react";
 import AuthLayout from "../../components/AuthLayout";
 
-export default function Login() {
+export default function Login({ setVistaActiva }) {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!email || !password) {
@@ -15,12 +15,33 @@ export default function Login() {
       return;
     }
 
-    console.log({
-      email,
-      password
-    });
+    try {
+      const response = await fetch('http://localhost:8000/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ email, password })
+      });
 
-    setError("");
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Credenciales incorrectas");
+      }
+
+      localStorage.setItem('ara_token', data.access_token);
+
+      setError("");
+      alert("¡Inicio de sesión exitoso!");
+
+      if (setVistaActiva) {
+        setVistaActiva('lecturas');
+      }
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   return (
