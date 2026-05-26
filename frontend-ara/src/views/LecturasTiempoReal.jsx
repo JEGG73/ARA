@@ -1,9 +1,49 @@
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend
+} from "chart.js";
+
+import { Pie } from "react-chartjs-2";
+import ChartDataLabels from "chartjs-plugin-datalabels";
+
+ChartJS.register(
+  ArcElement,
+  Tooltip,
+  Legend,
+  ChartDataLabels
+);
+
 function LecturasTiempoReal({
   nitrogeno,
   fosforo,
   potasio,
   actualizarTelemetria
 }) {
+
+  const dataNPK = {
+    labels: [
+      "Nitrógeno",
+      "Fósforo",
+      "Potasio"
+    ],
+    datasets: [
+      {
+        data: [
+          nitrogeno,
+          fosforo,
+          potasio
+        ],
+        backgroundColor: [
+          "#00ff88",
+          "#0099ff",
+          "#ffcc00"
+        ],
+        borderWidth: 1
+      }
+    ]
+  };
 
   return (
 
@@ -36,8 +76,48 @@ function LecturasTiempoReal({
 
         <div className="dashboard-card">
           <h3>Potasio (K)</h3>
-          <p>{potasio}</p>
+          <p>{potasio} mg/kg</p>
         </div>
+
+      </div>
+
+      <div
+        style={{
+          width: "350px",
+          margin: "40px auto"
+        }}
+      >
+
+        <h3
+          style={{
+            textAlign: "center",
+            marginBottom: "20px",
+            color: "#00ff88"
+          }}
+        >
+          Niveles NPK
+        </h3>
+
+        <Pie
+          data={dataNPK}
+          options={{
+            plugins: {
+              datalabels: {
+                color: "#ffffff",
+                font: {
+                  weight: "bold",
+                  size: 16
+                },
+                formatter: (value) => value + "%"
+              },
+              legend: {
+                labels: {
+                  color: "white"
+                }
+              }
+            }
+          }}
+        />
 
       </div>
 
