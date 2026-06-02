@@ -23,11 +23,12 @@ class AgrobotController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'unique_address' => 'required|string|unique:agrobots,unique_address',
+            'mac_address' => 'required|string|unique:agrobots,mac_address',
             'name' => 'nullable|string|max:255',
             'is_active' => 'boolean'
         ]);
+
+        $validatedData['user_id'] = $request->user()->id;
 
         $agrobot = Agrobot::create($validatedData);
 

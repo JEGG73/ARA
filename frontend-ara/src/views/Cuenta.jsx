@@ -63,7 +63,7 @@ function Cuenta({ authVista, setAuthVista, setVistaActiva, agrobotId, setAgrobot
       if (!response.ok) throw new Error(data.message);
 
       alert("¡Agrobot registrado con éxito!");
-      setAgrobotId(data.agrobot.id);
+      setAgrobotId(data.data.id);
       setNuevoMac("");
       setNuevoNombre("");
 
@@ -91,7 +91,7 @@ function Cuenta({ authVista, setAuthVista, setVistaActiva, agrobotId, setAgrobot
                 style={{ marginLeft: '10px', width: '100px', padding: '5px' }}
               />
               <p style={{ fontSize: '12px', color: '#888', marginTop: '10px' }}>
-                *En el futuro este campo será un menú desplegable (Select) que cargará tu lista de equipos automáticamente.
+                *Lista de equipos disponibles.
               </p>
             </div>
           </div>
